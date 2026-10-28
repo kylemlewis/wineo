@@ -255,6 +255,7 @@ dialog#pop::backdrop{background:rgba(20,3,8,.72);backdrop-filter:blur(3px)}
   .panel:nth-child(2){animation-delay:.05s}.panel:nth-child(3){animation-delay:.1s}.panel:nth-child(4){animation-delay:.15s}
 }
 </style>
+<style id="fit">.wrap{max-width:1440px}.top{padding-top:14px}.summary{padding:10px 0}.grid{gap:14px;padding-bottom:28px}.panel{padding:16px 20px 8px}.panel-h{margin-bottom:2px}.panel-h h2{font-size:24px}.row{padding:8px 0}</style>
 </head>
 <body>
 
@@ -546,7 +547,7 @@ function endsText(d){
   return 'Ends ' + d.ends_label;
 }
 // Dollars saved. Some flyers give only a % off, so the regular price is worked back from it (shown with ~).
-const SPLURGE = 30;
+const SPLURGE = 40;
 function saved(d){
   if(d.regular) return { amt: d.regular - d.sale, est: false };
   if(d.savings_pct) return { amt: d.sale * d.savings_pct / (100 - d.savings_pct), est: true };
