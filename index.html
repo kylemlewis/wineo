@@ -606,7 +606,7 @@ function rollTo(el, key, to){
 
 /* overview */
 function renderOverview(){
-  const cork = DATA.corkage.slice().sort((a,b) => feeKey(a,day) - feeKey(b,day) || age(a.checked) - age(b.checked));
+  const cork = DATA.corkage.filter(r => age(r.checked) <= 365).sort((a,b) => feeKey(a,day) - feeKey(b,day) || age(a.checked) - age(b.checked));
   const freeN = cork.filter(r => feeOn(r,day) === 0).length;
   const bn = DATA.bottle_nights.filter(b => b.days.includes(day)).sort((a,b) => RANK[a.confidence] - RANK[b.confidence]);
   const ev = upcoming();
@@ -637,7 +637,7 @@ function renderOverview(){
   $('see-bottles').textContent = 'All week';
   $('pb-list').innerHTML = bn.length ? bn.slice(0,6).map(bottleRow).join('') : `<p class="empty">No bottle deals listed for ${DNAME[day]}.</p>`;
 
-  $('pc-sub').textContent = 'cheapest ' + dayRef();
+  $('pc-sub').textContent = 'cheapest ' + dayRef() + ' · confirmed in the past year';
   $('see-corkage').textContent = 'All ' + DATA.corkage.length;
   $('pc-list').innerHTML = cork.slice(0,6).map(corkRow).join('');
 
