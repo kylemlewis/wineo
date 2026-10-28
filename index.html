@@ -568,7 +568,7 @@ const showPct = d => V(d).padded ? (isReal(d) && !V(d).approx ? V(d).pct : null)
 const rankPct = d => showPct(d) || d.savings_pct || 0;
 function verifyLine(d){
   const v = V(d);
-  if(v.v === 'real' && SHELF) return v.approx ? '' : `<span class="vchip" title="Compared with ${esc(v.store)} ${money(v.price)} on ${esc(v.checked)}">${Math.abs(v.pct)}% below other Calgary stores</span>`;
+  if(v.v === 'real' && SHELF) return v.approx ? `<span class="vchip" title="Compared with ${esc(v.store)} ${money(v.price)} on ${esc(v.checked)}; vintage or label differs, so no % shown">Checked vs. other stores</span>` : `<span class="vchip" title="Compared with ${esc(v.store)} ${money(v.price)} on ${esc(v.checked)}">${Math.abs(v.pct)}% below other Calgary stores</span>`;
   if(v.v === 'real') return `<span class="vchip" title="Compared with ${esc(v.store)} ${money(v.price)} on ${esc(v.checked)}">${v.approx ? 'Certified deal' : `Certified deal · ${Math.abs(v.pct)}% below other Calgary stores`}</span>`;
   if(v.v === 'inflated') return `<span class="vnote">Cheaper at ${esc(v.short)} (${money(v.price)})</span>`;
   return '';
