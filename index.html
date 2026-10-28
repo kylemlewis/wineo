@@ -290,7 +290,7 @@ dialog#pop::backdrop{background:rgba(20,3,8,.72);backdrop-filter:blur(3px)}
     <p class="summary" id="summary"></p>
     <div class="grid">
       <article class="panel" data-k="sales">
-        <div class="panel-h"><h2>Best Deals On the Shelf</h2><button class="see" data-go="sales" id="see-sales"></button></div>
+        <div class="panel-h"><h2>Best Deals On the Shelf</h2><span class="vchip" id="ps-cert" hidden title="Each deal here was checked against prices at other Calgary stores">Certified against other Calgary stores</span><button class="see" data-go="sales" id="see-sales"></button></div>
         <div class="rows" id="ps-list"></div>
       </article>
       <article class="panel" data-k="bottles">
@@ -558,6 +558,7 @@ function saved(d){
 }
 // --- price verification (data: deal.verify from verify/verification.json) ---
 const V = d => d.verify || {};
+let SHELF = false;
 const isReal = d => V(d).v === 'real';
 const isInfl = d => V(d).v === 'inflated';
 const vTier = d => isReal(d) ? 0 : isInfl(d) ? 2 : 1;            // verified first, inflated last
@@ -567,6 +568,7 @@ const showPct = d => V(d).padded ? (isReal(d) && !V(d).approx ? V(d).pct : null)
 const rankPct = d => showPct(d) || d.savings_pct || 0;
 function verifyLine(d){
   const v = V(d);
+  if(v.v === 'real' && SHELF) return v.approx ? '' : `<span class="vchip" title="Compared with ${esc(v.store)} ${money(v.price)} on ${esc(v.checked)}">${Math.abs(v.pct)}% below other Calgary stores</span>`;
   if(v.v === 'real') return `<span class="vchip" title="Compared with ${esc(v.store)} ${money(v.price)} on ${esc(v.checked)}">${v.approx ? 'Certified deal' : `Certified deal · ${Math.abs(v.pct)}% below other Calgary stores`}</span>`;
   if(v.v === 'inflated') return `<span class="vnote">Cheaper at ${esc(v.short)} (${money(v.price)})</span>`;
   return '';
@@ -627,11 +629,14 @@ function renderOverview(){
   rollTo($('sum-hp'), 'hp', bn.length);
 
   $('see-sales').textContent = 'All ' + live().length;
+  SHELF = true;
+  { const shown = everyday.slice(0,3).concat(splurge.slice(0,3)); $('ps-cert').hidden = !(shown.length && shown.every(isReal)); }
   $('ps-list').innerHTML =
     `<div class="subh"><b>Under $${SPLURGE}</b><span>biggest % off</span></div>` +
     (everyday.slice(0,3).map(d => saleRow(d)).join('') || '<p class="empty">None right now.</p>') +
     `<div class="subh"><b>$${SPLURGE} and up</b><span>most dollars off</span></div>` +
     (splurge.slice(0,3).map(d => saleRow(d,'dollars')).join('') || '<p class="empty">None right now.</p>');
+  SHELF = false;
 
   $('pb-sub').textContent = bn.length + ' ' + dayRef();
   $('see-bottles').textContent = 'All week';
