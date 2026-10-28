@@ -623,7 +623,8 @@ function rollTo(el, key, to){
 /* overview */
 function renderOverview(){
   const cork = DATA.corkage.filter(r => age(r.checked) <= 365).sort((a,b) => feeKey(a,day) - feeKey(b,day) || age(a.checked) - age(b.checked));
-  const freeN = cork.filter(r => feeOn(r,day) === 0).length;
+  const freshFees = cork.filter(r => !r.nocork && age(r.checked) <= 365).map(r => feeOn(r,day)).filter(f => typeof f === 'number');
+  const freeN = freshFees.length ? Math.min(...freshFees) : 0;
   const bn = DATA.bottle_nights.filter(b => b.days.includes(day)).sort((a,b) => RANK[a.confidence] - RANK[b.confidence]);
   const ev = upcoming();
   const evDay = ev.filter(e => e.date === nextDate(day));
@@ -632,7 +633,7 @@ function renderOverview(){
   const splurge = live().filter(d => d.sale >= SPLURGE && saved(d)).sort((a,b) => vRank(a,b) || saved(b).amt - saved(a).amt);
 
   let s = `<b>${day === DOW ? 'Tonight' : DNAME[day]} in Calgary</b>`;
-  s += `<a href="#corkage"><span class="num free" id="sum-free"></span> places waive corkage</a><span class="sep">/</span>`;
+  s += `<a href="#corkage">Verified corkage as low as <span class="num free">$<span id="sum-free"></span></span></a><span class="sep">/</span>`;
   s += `<a href="#bottles"><span class="num hp" id="sum-hp"></span> pour half-price bottles</a>`;
   if(evDay.length){
     const at = (evDay[0].time.match(/^[\d:]+\s*(am|pm)?/i)||[''])[0].replace(/:00/,'');
