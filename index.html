@@ -602,9 +602,9 @@ function renderOverview(){
   $('see-sales').textContent = 'All ' + live().length;
   $('ps-list').innerHTML =
     `<div class="subh"><b>Under $${SPLURGE}</b><span>biggest % off</span></div>` +
-    (everyday.slice(0,3).map(d => saleRow(d)).join('') || '<p class="empty">None right now.</p>') +
+    (everyday.slice(0,6-Math.min(3,splurge.length)).map(d => saleRow(d)).join('') || '<p class="empty">None right now.</p>') +
     `<div class="subh"><b>$${SPLURGE} and up</b><span>most dollars off</span></div>` +
-    (splurge.slice(0,3).map(d => saleRow(d,'dollars')).join('') || '<p class="empty">None right now.</p>');
+    (splurge.slice(0,6-Math.min(3,everyday.length)).map(d => saleRow(d,'dollars')).join('') || '<p class="empty">None right now.</p>');
 
   $('pb-sub').textContent = bn.length + ' ' + dayRef();
   $('see-bottles').textContent = 'All week';
