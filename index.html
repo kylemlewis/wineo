@@ -749,7 +749,7 @@ function renderOverview(){
   rollTo($('sum-free'), 'free', freeN);
   rollTo($('sum-hp'), 'hp', bn.length);
 
-  $('see-sales').textContent = 'All ' + live().length;
+  $('see-sales').textContent = 'See more';
   SHELF = true;
   $('ps-list').innerHTML =
     `<div class="subh"><b>Under $${SPLURGE}</b><span>biggest % off</span></div>` +
@@ -758,17 +758,17 @@ function renderOverview(){
     (splurge.slice(0,3).map(d => saleRow(d,'dollars')).join('') || '<p class="empty">None right now.</p>');
   SHELF = false;
 
-  $('see-bottles').textContent = 'All week';
+  $('see-bottles').textContent = 'See more';
   const cfFront = CELLAR.filter(r => r.front).slice(0,2), cfN = CELLAR.length;
   $('pb-list').innerHTML = `<div class="subh"><b>Half-price bottles</b><span>${bn.length} ${dayRef()}</span></div>` +
     (bn.length ? bn.slice(0, cfFront.length ? PB_N : 6).map(bottleRow).join('') : `<p class="empty">No bottle deals listed for ${DNAME[day]}.</p>`) +
-    (cfFront.length ? `<div class="subh rf-h"><b>Restaurant cellar finds</b><span>list price vs lowest Calgary store</span><button class="see" data-go="cellar" id="see-cellar">All ${cfN}</button></div>` + cfFront.map(rfRow).join('') : '');
+    (cfFront.length ? `<div class="subh rf-h"><b>Restaurant cellar finds</b><span>list price vs lowest Calgary store</span><button class="see" data-go="cellar" id="see-cellar">See more</button></div>` + cfFront.map(rfRow).join('') : '');
 
   $('pc-sub').textContent = 'cheapest ' + dayRef() + ' · confirmed in the past year';
-  $('see-corkage').textContent = 'All ' + DATA.corkage.length;
+  $('see-corkage').textContent = 'See more';
   $('pc-list').innerHTML = cork.slice(0,6).map(corkRow).join('');
 
-  $('see-events').textContent = 'All ' + ev.length;
+  $('see-events').textContent = 'See more';
   $('pe-list').innerHTML = ev.slice(0,5).map(eventRow).join('') || '<p class="empty">No upcoming events.</p>';
 }
 
