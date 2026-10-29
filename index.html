@@ -635,7 +635,7 @@ function saleRow(d, mode){
   const e = endsText(d);
   const head = `<div ${ROW}>${bottleArt(d)}
     <div class="main"><div class="t">${esc(d.wine)}</div><div class="s">${esc(d.retailer)}${verifyLine(d)}${e?' · '+e:''}</div></div>
-    ${pct}<span class="money">${money(d.sale)}${d.regular?`<small>${money(d.regular)}</small>`:''}${V(d).padded?'<em class="wph" title="The store\'s was price is above other Calgary stores\' regular price">was price high</em>':''}</span></div>`;
+    ${pct}<span class="money">${money(d.sale)}${d.regular?`<small>${money(d.regular)}</small>`:''}${V(d).padded?'<em class="wph" title="The store\'s was price is above other Calgary stores\' regular price">was priced high</em>':''}</span></div>`;
   return `<div class="item${isInfl(d)?' inflated':''}">${head}<div class="detail">${d.notes?`<p>${esc(d.notes)}</p>`:''}
     <dl><dt>Type</dt><dd>${esc(d.type)}</dd>${d.style?`<dt>Style</dt><dd>${esc(d.style)}</dd>`:''}<dt>${d.market?'Price':'Ends'}</dt><dd>${esc(d.market?'Everyday price, not a sale (no end date)':(d.ends_label||'—'))}</dd><dt>Source</dt><dd>${link(d.source_url, d.retailer)}</dd>${verifyDetail(d)}</dl></div></div>`;
 }
