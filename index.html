@@ -566,8 +566,8 @@ function renderCellar(){
   const g = k => m.filter(r => r.group === k).sort(cmp);
   const f = g('find'), h = g('hh');
   $('cf-count').textContent = (f.length + h.length) + ' finds' + (h.length ? ' · ' + h.length + ' at deal prices' : '');
-  $('cf-list').innerHTML = ((f.length ? `<div class="group">Within 10% of store price · list price</div>` + f.map(cfRow).join('') : '') +
-    (h.length ? `<div class="group">Best at happy-hour prices</div>` + h.map(cfRow).join('') : '')) || '<p class="empty">No finds match.</p>';
+  $('cf-list').innerHTML = ((h.length ? `<div class="group">Best at happy-hour prices</div>` + h.map(cfRow).join('') : '') +
+    (f.length ? `<div class="group">Within 10% of store price · list price</div>` + f.map(cfRow).join('') : '')) || '<p class="empty">No finds match.</p>';
 }
 function bottleRow(b){
   const head = `<div ${ROW}><span class="conf c-${b.confidence}" title="${CONF[b.confidence]}"></span>
