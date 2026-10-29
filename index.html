@@ -631,7 +631,7 @@ function saleRow(d, mode){
   let pct = sp ? talker('−' + Math.round(sp) + '%', '', d.id) : '';
   if(mode === 'dollars'){ const v = saved(d); if(V(d).padded){ pct = (isReal(d) && !V(d).approx) ? talker('Save $' + Math.round(V(d).price - d.sale), '', d.id) : ''; } else if(v) pct = talker((v.est ? '~' : '') + 'Save $' + Math.round(v.amt), '', d.id); }
   if(d.market) pct = '';
-  if(mode === 'below' && d.verify && d.verify.price){ const b = d.verify.price - d.sale; pct = b > 0 && !d.market ? talker('$' + Math.round(b) + ' below', '', d.id) : (d.market ? '' : pct); }
+  if(mode === 'below' && d.verify && d.verify.price){ const b = d.verify.price - d.sale; pct = b > 0 ? talker('$' + Math.round(b) + ' below', '', d.id) : (d.market ? '' : pct); }
   const e = endsText(d);
   const head = `<div ${ROW}>${bottleArt(d)}
     <div class="main"><div class="t">${esc(d.wine)}</div><div class="s">${esc(d.retailer)}${verifyLine(d)}${e?' · '+e:''}</div></div>
