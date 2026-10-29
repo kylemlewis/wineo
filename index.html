@@ -547,7 +547,7 @@ function rfRow(r){
   const tk = r.deal ? talker(esc(r.deal_tag.split(' ')[0] + ' happy-hour price'), 'yellow', r.id) : '';
   return `<div class="item rf-i"><div ${ROW}><span class="conf c-high"></span>
     <div class="main"><div class="t">${esc(r.restaurant)}${note ? `<span class="rf-n">${esc(note)}</span>` : ''}</div><div class="s">${esc(cfName(r))}<span class="vchip">${cfTag(r.pct)}</span></div>${note ? `<div class="rf-m">${tk}<span>${esc(note)}</span></div>` : ''}</div>${tk}
-    <span class="money">${money(r.price)}<small class="rf-store">${esc(cfStore(r.store))} ${money(r.store_price)}</small></span></div>${cfDetail(r)}</div>`;
+    <span class="money">${r.deal ? `<s class="rf-was">${money(r.list_price)}</s>` : money(r.price)}<small class="rf-store">${esc(cfStore(r.store))} ${money(r.store_price)}</small></span></div>${cfDetail(r)}</div>`;
 }
 // full list row: deal rows get the yellow deal-price talker (on its own line under the wine on phones), struck regular price, store price under it
 function cfRow(r){
