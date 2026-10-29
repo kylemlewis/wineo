@@ -480,7 +480,7 @@ function feeHtml(r){
 }
 function freshHtml(d){
   const f = fresh(d);
-  return `<div class="fresh" title="Last confirmed ${esc(d)}"><div class="bar-f"><i style="width:${Math.round(f.pct*100)}%;background:${f.c}"></i></div><span style="color:${f.c}">${ago(d)}</span></div>`;
+  return `<div class="fresh" title="Last confirmed ${esc(d)}"><div class="bar-f"><i style="width:${Math.round(f.pct*100)}%;background:${f.c}"></i></div><span style="color:${f.c}">Verified ${ago(d)}</span></div>`;
 }
 function corkRow(r){
   const head = `<div ${ROW}><div class="main"><div class="t">${esc(r.name)}</div>${r.area?`<div class="s">${esc(r.area)}</div>`:''}</div>${freshHtml(r.checked)}${feeHtml(r)}</div>`;
