@@ -588,7 +588,7 @@ function renderCellar(){
 }
 function bottleRow(b){
   const head = `<div ${ROW}><span class="conf c-${b.confidence}" title="${CONF[b.confidence]}"></span>
-    <div class="main"><div class="t">${esc(b.name)}</div><div class="s">${esc(b.deal)}</div></div>${b.hours?talker(b.hours,'yellow',b.id):''}${b.checked?freshHtml(b.checked):''}${weekDots(b.days)}</div>`;
+    <div class="main"><div class="t">${esc(b.name)}</div><div class="s">${esc(b.deal)}</div></div>${b.hours?talker(b.hours,'yellow',b.id):''}${b.checked?freshHtml(b.checked):''}</div>`;
   return `<div class="item">${head}<div class="detail">${b.conditions?`<p>${esc(b.conditions)}</p>`:''}
     <dl><dt>Where</dt><dd>${esc(b.area)}</dd><dt>Days</dt><dd>${b.days.length===7?'Every day':b.days.map(d=>DNAME[d]).join(', ')}</dd>${b.hours?`<dt>Hours</dt><dd>${esc(b.hours)}</dd>`:''}
     <dt>Source</dt><dd>${link(b.source_url,'Source')} · <span class="conf c-${b.confidence}"></span> ${CONF[b.confidence]}</dd></dl></div></div>`;
