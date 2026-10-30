@@ -404,7 +404,7 @@ dialog#pop::backdrop{background:rgba(20,3,8,.72);backdrop-filter:blur(3px)}
   <section id="v-cellar" data-view hidden>
     <div class="view-h">
       <h1>Restaurant cellar finds</h1>
-      <p>Wine-list bottles priced close to, or below, the lowest Calgary store price for the same wine, at list price or at a verified happy-hour or wine-night price. Best deal ranks by dollars saved vs that store price. Where the restaurant&#39;s corkage fee is verified, each bottle also shows whether ordering it beats bringing your own. Lists and vintages change, so confirm with your server.</p>
+      <p>Wine-list bottles priced close to, or below, the lowest Calgary store price for the same wine, at list price or at a verified happy-hour or wine-night price. Best deal ranks by percent below that store price. Where the restaurant&#39;s corkage fee is verified, each bottle also shows whether ordering it beats bringing your own. Lists and vintages change, so confirm with your server.</p>
     </div>
     <div class="filters">
       <input type="search" id="cf-q" placeholder="Search restaurant or wine" aria-label="Search cellar finds">
@@ -572,9 +572,9 @@ function cfRow(r){
   return `<div class="item cf-i"><div ${ROW}><div class="main"><div class="t">${esc(cfName(r))}</div><div class="s">${esc(r.restaurant)}<span class="vchip">${cfTag(r.pct)}</span>${cfByo(r)}</div>${r.deal ? `<div class="rf-m">${tk}<span>${esc(r.deal_short)}</span></div>` : ''}</div>${tk}
     <span class="money">${r.deal ? `<s class="rf-was">${money(r.list_price)}</s>` : money(r.price)}<small class="rf-store">${esc(cfStore(r.store))} ${money(r.store_price)}</small></span></div>${cfDetail(r)}</div>`;
 }
-// Best deal: dollars saved vs the lowest store price (same basis for every row). Happy-hour price: deal rows by deal/store ratio, then the rest.
+// Best deal: percent below the lowest store price (same basis for every row). Happy-hour price: deal rows by deal/store ratio, then the rest.
 const CF_SORT = {
-  deal: (a,b) => b.save - a.save || a.ratio - b.ratio,
+  deal: (a,b) => a.pct - b.pct || b.save - a.save,
   byo: (a,b) => ((b.byo_diff != null) - (a.byo_diff != null)) || ((b.byo_diff || 0) - (a.byo_diff || 0)) || b.save - a.save,
   low: (a,b) => a.price - b.price || b.save - a.save,
   rest: (a,b) => a.restaurant.localeCompare(b.restaurant) || b.save - a.save
