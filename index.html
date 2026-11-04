@@ -641,6 +641,11 @@ function endsText(d){
 }
 // Dollars saved. Some flyers give only a % off, so the regular price is worked back from it (shown with ~).
 const SPLURGE = 40;
+const FEATURED = {"under": ["dl-115", "dl-153", "dl-1"], "over": ["dl-26", "dl-29", "dl-11"], "cellar": ["cf-teatro-nv-champagne-mandois-brut-origine", "cf-porch-nv-de-vilmont-champagne-brut-1er-cru"]};
+// build-time picks (live-checked, gently rotated); drop any that expired since the build and top up from the ranked list
+function featPick(ranked, ids, n, pool){ const src = pool || ranked, by = new Map(src.map(r => [r.id, r]));
+  const okIds = new Set(ranked.map(r => r.id)), out = ids.map(i => by.get(i)).filter(r => r && (pool || okIds.has(r.id)));
+  for(const r of ranked){ if(out.length >= n) break; if(!out.includes(r)) out.push(r); } return out.slice(0, n); }
 const PB_N = 5;  // half-price rows on the homepage when cellar finds show (keeps the panel height)
 function saved(d){
   if(d.market) return null;
@@ -768,13 +773,13 @@ function renderOverview(){
   SHELF = true;
   $('ps-list').innerHTML =
     `<div class="subh"><b>Under $${SPLURGE}</b><span>biggest % off</span></div>` +
-    (everyday.slice(0,3).map(d => saleRow(d)).join('') || '<p class="empty">None right now.</p>') +
+    (featPick(everyday, FEATURED.under, 3).map(d => saleRow(d)).join('') || '<p class="empty">None right now.</p>') +
     `<div class="subh"><b>$${SPLURGE} and up</b><span>most dollars off</span></div>` +
-    (splurge.slice(0,3).map(d => saleRow(d,'dollars')).join('') || '<p class="empty">None right now.</p>');
+    (featPick(splurge, FEATURED.over, 3).map(d => saleRow(d,'dollars')).join('') || '<p class="empty">None right now.</p>');
   SHELF = false;
 
   $('see-bottles').textContent = 'See more';
-  const cfFront = CELLAR.filter(r => r.front).slice(0,2), cfN = CELLAR.length;
+  const cfFront = featPick(CELLAR.filter(r => r.front), FEATURED.cellar, 2, CELLAR), cfN = CELLAR.length;
   $('pb-list').innerHTML = `<div class="subh"><b>Half-price bottles</b><span>${bn.length} ${dayRef()}</span></div>` +
     (bn.length ? bn.slice(0, cfFront.length ? PB_N : 6).map(bottleRow).join('') : `<p class="empty">No bottle deals listed for ${DNAME[day]}.</p>`) +
     (cfFront.length ? `<div class="subh rf-h"><b>Restaurant cellar finds</b><span>list price vs lowest Calgary store</span><button class="see" data-go="cellar" id="see-cellar">See more</button></div>` + cfFront.map(rfRow).join('') : '');
