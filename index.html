@@ -584,6 +584,31 @@ function renderCellar(){
   $('cf-count').textContent = all.length + ' finds' + (nd ? ' · ' + nd + ' at happy-hour prices' : '');
   $('cf-list').innerHTML = all.length ? all.map(cfRow).join('') : '<p class="empty">No finds match.</p>';
 }
+let ROT = {}; try { ROT = JSON.parse(localStorage.getItem('wineo_rot') || '{}') || {}; } catch(e) {}
+function rotPick(rows, n, tie, ok){
+  const out = []; let i = 0;
+  while(i < rows.length && out.length < n){
+    const k = tie(rows[i]); let j = i + 1;
+    if(k != null) while(j < rows.length && tie(rows[j]) === k) j++;
+    const g = rows.slice(i, j);
+    if(out.length + g.length <= n) out.push(...g);
+    else {
+      const t = new Map(g.map(r => [r, Math.random()]));
+      const pick = g.slice().sort((a,b) => (ok ? ok(b) - ok(a) : 0) || (ROT[a.id] || 0) - (ROT[b.id] || 0) || t.get(a) - t.get(b)).slice(0, n - out.length);
+      out.push(...g.filter(r => pick.includes(r)));
+      const now = Date.now(); pick.forEach(r => ROT[r.id] = now);
+      try { localStorage.setItem('wineo_rot', JSON.stringify(ROT)); } catch(e) {}
+    }
+    i = j;
+  }
+  return out;
+}
+const corkPerk = r => /Deal nights:/.test(r.notes || '') ? 1 : 0;
+function corkTie(r){ const f = feeOn(r, day); return (r.nocork || f == null) ? null : f + '|' + (r.free_days || []).join(',') + '|' + ((r.notes || '').match(/Deal nights:[^.]*/) || [''])[0]; }
+function bnPct(b){ const t = b.deal; if(/up to/i.test(t)) return 49; const m = t.match(/(\d+)%/); return m ? +m[1] : /half|1\/2/i.test(t) ? 50 : 0; }
+function bnBreadth(b){ const t = b.deal.replace(/all (day|night)/ig, ''); return /select|list|rotating|under \$|sparkling|\d+ bottles|cellar/i.test(t) ? 1 : /\ball\b|any bottle/i.test(t) ? 3 : 2; }
+function bnHours(b){ const h = b.hours || ''; if(/^\s*all (day|night)\s*$/i.test(h) || /all day/i.test(b.deal)) return 2; return (!h.includes('·') && /close|late|after/i.test(h)) ? 1 : 0; }
+const bnTie = b => [bnPct(b), bnBreadth(b), bnHours(b), cfWins(b), RANK[b.confidence]].join('|');
 function bottleRow(b){
   const head = `<div ${ROW}><span class="conf c-${b.confidence}" title="${CONF[b.confidence]}"></span>
     <div class="main"><div class="t">${esc(b.name)}</div><div class="s">${esc(b.deal)}</div></div>${b.hours?talker(b.hours,'yellow',b.id):''}${b.checked?freshHtml(b.checked):''}</div>`;
@@ -747,10 +772,10 @@ function rollTo(el, key, to){
 
 /* overview */
 function renderOverview(){
-  const cork = DATA.corkage.filter(r => !r.members && age(r.checked) <= 365).sort((a,b) => feeKey(a,day) - feeKey(b,day) || age(a.checked) - age(b.checked));
+  const cork = DATA.corkage.filter(r => !r.members && age(r.checked) <= 365).sort((a,b) => feeKey(a,day) - feeKey(b,day) || corkPerk(b) - corkPerk(a) || String(corkTie(a)).localeCompare(String(corkTie(b))) || age(a.checked) - age(b.checked));
   const freshFees = cork.filter(r => !r.nocork && age(r.checked) <= 365).map(r => feeOn(r,day)).filter(f => typeof f === 'number');
   const freeN = freshFees.length ? Math.min(...freshFees) : 0;
-  const bn = DATA.bottle_nights.filter(b => b.days.includes(day)).sort((a,b) => cfWins(b) - cfWins(a) || RANK[a.confidence] - RANK[b.confidence]);
+  const bn = DATA.bottle_nights.filter(b => b.days.includes(day)).sort((a,b) => bnPct(b) - bnPct(a) || bnBreadth(b) - bnBreadth(a) || bnHours(b) - bnHours(a) || cfWins(b) - cfWins(a) || RANK[a.confidence] - RANK[b.confidence] || a.name.localeCompare(b.name));
   const ev = upcoming();
   const evDay = ev.filter(e => e.date === nextDate(day));
   const sales = live().filter(d => d.savings_pct).sort((a,b) => vRank(a,b) || rankPct(b) - rankPct(a));
@@ -781,15 +806,15 @@ function renderOverview(){
   $('see-bottles').textContent = 'See more';
   const cfFront = featPick(CELLAR.filter(r => r.front), FEATURED.cellar, 2, CELLAR), cfN = CELLAR.length;
   $('pb-list').innerHTML = `<div class="subh"><b>Half-price bottles</b><span>${bn.length} ${dayRef()}</span></div>` +
-    (bn.length ? bn.slice(0, cfFront.length ? PB_N : 6).map(bottleRow).join('') : `<p class="empty">No bottle deals listed for ${DNAME[day]}.</p>`) +
+    (bn.length ? rotPick(bn, cfFront.length ? PB_N : 6, bnTie).map(bottleRow).join('') : `<p class="empty">No bottle deals listed for ${DNAME[day]}.</p>`) +
     (cfFront.length ? `<div class="subh rf-h"><b>Restaurant cellar finds</b><span>list price vs lowest Calgary store</span><button class="see" data-go="cellar" id="see-cellar">See more</button></div>` + cfFront.map(rfRow).join('') : '');
 
   $('pc-sub').textContent = 'cheapest ' + dayRef() + ' · confirmed in the past year';
   $('see-corkage').textContent = 'See more';
-  $('pc-list').innerHTML = cork.slice(0,6).map(corkRow).join('');
+  $('pc-list').innerHTML = rotPick(cork, 6, corkTie).map(corkRow).join('');
 
   $('see-events').textContent = 'See more';
-  $('pe-list').innerHTML = ev.slice(0,5).map(eventRow).join('') || '<p class="empty">No upcoming events.</p>';
+  $('pe-list').innerHTML = rotPick(ev, 5, e => e.date, e => !/sold out/i.test(e.title + ' ' + e.price)).map(eventRow).join('') || '<p class="empty">No upcoming events.</p>';
 }
 
 /* section views */
